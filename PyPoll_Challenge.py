@@ -1,10 +1,9 @@
 import csv
 import os
-from unicodedata import name
-
-
-file_to_load = os.path.join("Resources", "PyPoll_Challenge.csv")
-file_to_save = os.path.join("Results", "election_analysis.txt")
+# Assign a variable to load a file from a path.
+file_to_load = os.path.join("Resources", "election_results.csv")
+# Assign a variable to save the file to a path.
+file_to_save = os.path.join("Results", "update_election_analysis.txt")
 
 total_votes = 0
 
@@ -17,51 +16,57 @@ county_votes = {}
 
 
 winning_candidate = ""
+
 winning_count = 0
 winning_percentage = 0
 
 winning_county = ""
 
 winning_county_votes = 0
-winning_county_votes_percentage = 0
+winning_county_vote_percentage = 0
 
 
-with open(file_to_load) as election_data:
-    reader = csv.reader(election_data)
+with open(file_to_load) as election_results:
+    file_reader = csv.reader(election_results)
 
-    headers = next(reader)
+    headers = next(file_reader)
  
-    for row in reader:
-       total_votes = total_votes + 1
+    for row in file_reader:
+
+        total_votes += 1
     
-       candidate_name = row[2]
+        candidate_name = row[2]
 
-       county_name = row[1]
+        county_name = row[1]
 
-    if candidate_name not in candidate_options:
+        if candidate_name not in candidate_options:
 
-        candidate_options.append(candidate_name)
+           # Add the candidate name to the candidate list.
+            candidate_options.append(candidate_name)
 
-        candidate_votes[candidate_name] = 0
+           # 2. Begin tracking that candidate's vote count.
+            candidate_votes[candidate_name] = 0
 
+           # 3. Add a vote to that candidates count
         candidate_votes[candidate_name] +=1
 
-    if county_name not in county_options:
+        if county_name not in county_options:
 
-        county_options.append(county_name)
+            county_options.append(county_name)
 
-        county_votes[county_name] = 0
+            county_votes[county_name] = 0
 
         county_votes[county_name] +=1     
 
-with open(file_to_save, 'w') as txt_file:
+with open(file_to_save, "w") as txt_file:
 
     election_results = (
         f"\nElection Results\n"
         f"-------------------------\n"
         f"Total Votes: {total_votes:,}\n"
-        f"-------------------------\n"
-        f"County Votes:\n") 
+        f"-------------------------\n\n"
+        f"County Votes:\n"
+        f"-------------------------\n") 
     print(election_results, end="")
 
     txt_file.write(election_results)
@@ -69,24 +74,25 @@ with open(file_to_save, 'w') as txt_file:
     for county_name in county_votes:
 
         c_votes = county_votes[county_name]
-        c_votes_percentage = float(c_votes) / float(total_votes) *100
 
-        county_results = (f"{county_name}: {c_votes_percentage:.1f}% ({c_votes:,})\n")
+        c_vote_percentage = float(c_votes) / float(total_votes) * 100
+
+        county_results = (f"{county_name}: {c_vote_percentage:.1f}% ({c_votes:,})\n")
 
         print(county_results)
 
         txt_file.write(county_results)
 
-        if(c_votes > winning_county_votes):
+        if (c_votes > winning_county_votes):
             winning_county_votes = c_votes
             winning_county = county_name
-            winning_county_votes_percentage = c_votes_percentage
+            winning_county_vote_percentage = c_vote_percentage
 
     winning_county_summary = (
         f"------------------------\n"
         f"County with the highest turnout: {winning_county}\n"
         f"Vote Count for {winning_county}: {winning_county_votes:,}\n"
-        f"Percentage of total votes for {winning_county}: {winning_county_votes_percentage:.1f}%\n"
+        f"Percentage of total votes for {winning_county}: {winning_county_vote_percentage:.1f}%\n"
         f"-------------------------\n")
 
     print(winning_county_summary)
